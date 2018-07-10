@@ -231,29 +231,49 @@
 
 <script src="assets/js/app.js"></script>
 <script>
+    var status = 1;
+    var servers = 0;
+    var serversDone = 0;
     $(document).ready(function(){
-        $.get("getStatus.php?action=getThread", function(data){
-            for (var i = 0; i < data; i++)
-                start(i);
-        });
+        getThread();
         //setInterval("refreshAll()", 10000);
     });
+
+    function resetStatus(){
+        status = 0;
+    }
 
     function refreshAll(){
         refreshServer();
     }
 
-    function refreshServer(){
-        document.getElementById('routePackages').innerHTML = ""
+    function getThread(){
+        status = 1;
+        servers = 0;
+        serversDone = 0;
         $.get("getStatus.php?action=getThread", function(data){
+            servers = data;
             for (var i = 0; i < data; i++)
                 start(i);
         });
     }
 
+    function refreshServer(){
+        if(status == 0){
+            document.getElementById('routePackages').innerHTML = ""
+            getThread();
+        }
+    }
+
     function start(id){
         $.get("getStatus.php?action=checkServer&server=" + id, function(data){
-            document.getElementById('routePackages').innerHTML = document.getElementById('routePackages').innerHTML + data
+            document.getElementById('routePackages').innerHTML = document.getElementById('routePackages').innerHTML + data;
+            serversDone = serversDone + 1;
+            if(servers == serversDone){
+                dataa = "<tr><td>加载完成</td><td>/</td><td>/</td><td>/</td><td>/</td><td>/</td></tr>";
+                document.getElementById('routePackages').innerHTML = document.getElementById('routePackages').innerHTML + dataa;
+                resetStatus()
+            }
         });
     }
 </script>
